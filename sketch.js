@@ -1,18 +1,18 @@
 // Initialize the Image Classifier method with MobileNet. A callback needs to be passed.
-let classifier;
+let mobilenet;
+let video;
+let label = '';
 
-// A variable to hold the image we want to classify
-let img;
-
-function preload() {
-  classifier = ml5.imageClassifier('MobileNet');
-  img = loadImage('images/bird.png');
+function draw() {
+  background(0);
+  image(video, 0, 0);
+  fill(255);
+  textSize(32);
+  text(label, 10, height - 20);
 }
 
-function setup() {
-  createCanvas(400, 400);
-  classifier.classify(img, gotResult);
-  image(img, 0, 0);
+function modelReady() {
+  mobilenet.predict(gotResult);
 }
 
 // A function to run when we get any errors and the results
@@ -22,8 +22,18 @@ function gotResult(error, results) {
     console.error(error);
   } else {
     // The results are in an array ordered by confidence.
-    console.log(results);
-    createDiv(`Label: ${results[0].label}`);
-    createDiv(`Confidence: ${nf(results[0].confidence, 0, 2)}`);
+    label = results[0].label;
+    mobilenet.predict(gotResult);
   }
 }
+
+function setup() {
+  createCanvas(640, 550);
+  video = createCapture(VIDEO);
+  video.hide();
+  background(0);
+  mobilenet = ml5.imageClassifier('MobileNet', video, modelReady);
+}
+
+
+
